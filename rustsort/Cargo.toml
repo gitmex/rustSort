@@ -1,0 +1,7 @@
+[package]
+name = "rustsort"
+version = "0.1.0"
+authors = ["mex <c@mexie.net>"]
+
+[dependencies]
+rand = "0.3.15"
