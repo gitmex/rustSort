@@ -29,23 +29,31 @@ fn go_bubble(sortier_mir: &mut [i32], factor:i32){
 		}
 		if counter % factor==0 {
 			print!(".");
-			counter+=1;
+			
 		}
+		counter+=1;
 	}
-	println!("Replaces {} Compares {}\n\n", replaces, compares);
+	println!("Bubble Replaces {} Compares {}\n", replaces, compares);
 }
 
-fn go_selection(sortier_mir: &mut [i32]){
+fn go_selection(sortier_mir: &mut [i32], factor:i32){
 	let mut tempInt=0;
 	let mut starter=sortier_mir[0];
 	let mut starterpos = 0;	
 	let mut switcher = false;
 	let mut compares = 0;
 	let mut replaces = 0;
+	let mut counter = 0;
+	
 	//println!("{:?}", sortier_mir);
 
 	for j in 0..sortier_mir.len(){
-		print!(".");
+		if counter % factor==0 {
+			print!(".");
+		}
+		
+		counter+=1;
+		
 		starter=sortier_mir[j];
 		starterpos=j;
 		switcher = false;
@@ -62,20 +70,24 @@ fn go_selection(sortier_mir: &mut [i32]){
 			sortier_mir.swap(starterpos,j);
 		}
 	}	
-	println!("Replaces {} Compares {}\n\n", replaces, compares);
+	println!("Selection Replaces {} Compares {}\n", replaces, compares);
 
 }
 
-fn go_insertion(sortier_mir: &mut [i32]){
+fn go_insertion(sortier_mir: &mut [i32], factor:i32){
 	let mut to_sort = 0;
 	let mut j = 0;		
 	let mut compares = 0;
 	let mut replaces = 0;
+	let mut counter = 0;
 
 
-	for i in 2..sortier_mir.len(){
+	for i in 1..sortier_mir.len(){
 		to_sort=sortier_mir[i];
 		j=i;
+
+		//println!("{:?}", sortier_mir);
+		
 
 		while j > 0 && sortier_mir[j-1] > to_sort{
 			compares+=1;
@@ -84,17 +96,24 @@ fn go_insertion(sortier_mir: &mut [i32]){
 			j=j-1;
 				
 		}
-		print!(".");
+		if counter % factor==0 {
+			print!(".");
+		}
+		counter+=1;
+		
 		sortier_mir[j]=to_sort;
 		replaces+=1;		
 	}
-	println!("Replaces {} Compares {}\n\n", replaces, compares);
+	//println!("{:?}", sortier_mir);
+	
+	println!("Insert Replaces {} Compares {}\n", replaces, compares);
 }
 
-fn go_shell(sortier_mir: &mut [i32]){
+fn go_shell(sortier_mir: &mut [i32], factor:i32){
 	let mut compares = 0;
 	let mut replaces = 0;
 	let mut gap = sortier_mir.len() / 2;
+	let mut counter = 0;
 	
 	while gap != 0 {
 		for i in gap..sortier_mir.len() {
@@ -102,7 +121,11 @@ fn go_shell(sortier_mir: &mut [i32]){
 			while sortier_mir[j] > sortier_mir[j + gap] {
 				compares+=1;	
 				sortier_mir.swap(j, j + gap);
-				print!(".");
+				if counter % factor==0 {
+					print!(".");
+				}
+				counter+=1;
+					
 				replaces+=1;
 				if j >= gap {
 					j -= gap;
@@ -115,34 +138,36 @@ fn go_shell(sortier_mir: &mut [i32]){
 		}
 		gap /=2;		
 	}
-
-	println!("Replaces {} Compares {}", replaces, compares);
+	println!("Shell Replaces {} Compares {}\n", replaces, compares);
 }
 
 fn main() {
-	let lenlen: i32=10;	
-	let factor: i32= 10;    
+	let lenlen: i32=50;	
+	let factor: i32=20;    
 	let mut secret_num: Vec<_> = (0..lenlen*factor).collect();
 	assert_eq!(lenlen*factor,secret_num.len() as i32);
 
     let mut rng = rand::thread_rng();
+	for i in 0..1000{
+	    rng.shuffle(&mut secret_num);
 
-    rng.shuffle(&mut secret_num);
+		go_bubble(secret_num.as_mut_slice(), factor);
+		go_verify(secret_num.as_mut_slice());
+		rng.shuffle(&mut secret_num);
 
-	go_bubble(secret_num.as_mut_slice(), factor);
-	go_verify(secret_num.as_mut_slice());
-	rng.shuffle(&mut secret_num);
+		go_selection(secret_num.as_mut_slice(), factor);
+		go_verify(secret_num.as_mut_slice());
 
-	go_selection(secret_num.as_mut_slice());
+		rng.shuffle(&mut secret_num);
 
-	rng.shuffle(&mut secret_num);
+		go_insertion(secret_num.as_mut_slice(), factor);
+		go_verify(secret_num.as_mut_slice());
 
-	go_insertion(secret_num.as_mut_slice());
+		rng.shuffle(&mut secret_num);
 
-	rng.shuffle(&mut secret_num);
-
-	go_shell(secret_num.as_mut_slice());
-
+		go_shell(secret_num.as_mut_slice(), factor);
+		go_verify(secret_num.as_mut_slice());
+	}
 }
 
 
